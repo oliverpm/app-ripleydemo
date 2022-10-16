@@ -42,7 +42,7 @@ pipeline {
         stage('Deploy to Minukube') {
             steps {
                 echo 'Deploy App to Minukube'
-                sh "sshpass -p AdrikCedrik.7 scp deploymentServiceRipley.yml.yml administrador@192.168.18.66:/home/administrador/ripley"
+                sh "sshpass -p AdrikCedrik.7 scp deploymentServiceRipley.yml administrador@192.168.18.66:/home/administrador/ripley"
                 sh "sshpass -p AdrikCedrik.7 ssh -t administrador@192.168.18.66 'cd ripley; kubectl apply -f deploymentServiceRipley.yml' "
             }
         }
