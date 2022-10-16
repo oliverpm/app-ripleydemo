@@ -1,11 +1,11 @@
-apiVersion: v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ripleydemo-deployment
   labels:
     app: app-ripleydemo
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: app-ripleydemo
@@ -18,21 +18,18 @@ spec:
       - name: nodeserver
         image: oliverpm/hola-ripley:latest
         ports:
-        - containerPort: 3000
-        
-        
----
+        - containerPort: 8085
 
+---
 apiVersion: v1
 kind: Service
 metadata:
-  name: ripleydemo-service
+  name: app-ripleydemo-service
 spec:
   selector:
-    app: app-ripleydemo 
+    app: app-ripleydemo
   type: LoadBalancer
   ports:
   - protocol: TCP
-    port: 5000
-    targetPort: 3000
-    nodePort: 31110
+    port: 8666
+    targetPort: 8085
