@@ -2,11 +2,11 @@ pipeline {
     agent any
 
     environment {	    
-	def IP_HOST_LAB_DEMORIPLEY	="192.168.18.66"    
+	    def IP_HOST_LAB_DEMORIPLEY	="192.168.18.66"
         DOCKER_CREDENTIALS		=credentials('docker-oliverpm')        	    
         JENKINS_CREDENTIALS		=credentials('jenkins-oliverpm')	    
         DOCKERHUB_CREDENTIALS		=credentials('dockerhub-oliverpm')	    
-	MINIKUBE_CREDENTIALS		=credentials('minikube-oliverpm')    
+	    MINIKUBE_CREDENTIALS		=credentials('minikube-oliverpm')
     }
 
     stages {
@@ -71,8 +71,8 @@ pipeline {
     
     post {
 	always {
-            	echo 'docker logout'
-		sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' ssh -t $JENKINS_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}  ' docker logout ' "
+            echo 'docker logout'
+		    sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' ssh -t $JENKINS_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}  ' docker logout ' "
 		}
 	}
     
