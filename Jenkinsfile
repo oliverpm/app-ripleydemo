@@ -1,11 +1,11 @@
 pipeline {
     agent any
 
-    environment {
-	def IP_JENKINSHOST		="192.168.18.66"    
-        DOCKER_CREDENTIALS		=credentials('docker-oliverpm')        
-        JENKINS_CREDENTIALS		=credentials('jenkins-oliverpm')
-        DOCKERHUB_CREDENTIALS		=credentials('dockerhub-oliverpm')
+    environment {	    
+	def IP_HOST_LAB_DEMORIPLEY	="192.168.18.66"    
+        DOCKER_CREDENTIALS		=credentials('docker-oliverpm')        	    
+        JENKINS_CREDENTIALS		=credentials('jenkins-oliverpm')	    
+        DOCKERHUB_CREDENTIALS		=credentials('dockerhub-oliverpm')	    
 	MINIKUBE_CREDENTIALS		=credentials('minikube-oliverpm')    
     }
 
@@ -31,33 +31,33 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' scp Dockerfile $DOCKER_CREDENTIALS_USR@${IP_JENKINSHOST}:/home/administrador/ripley"
-                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' scp target/HolaRipley-0.0.1-SNAPSHOT.jar $DOCKER_CREDENTIALS_USR@${IP_JENKINSHOST}:/home/administrador/ripley/target"
-                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' ssh -t $DOCKER_CREDENTIALS_USR@${IP_JENKINSHOST} 'cd ripley; docker build . -t oliverpm/hola-ripley'"
+                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' scp Dockerfile $DOCKER_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}:/home/administrador/ripley"
+                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' scp target/HolaRipley-0.0.1-SNAPSHOT.jar $DOCKER_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}:/home/administrador/ripley/target"
+                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' ssh -t $DOCKER_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY} 'cd ripley; docker build . -t oliverpm/hola-ripley'"
             }
         }
         stage('Push Image To Docker Hub') {
             steps {
                 echo 'Push Image To Docker Hub'
-                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' ssh -t $DOCKER_CREDENTIALS_USR@192.168.18.66 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin' "
-                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' ssh -t $DOCKER_CREDENTIALS_USR@192.168.18.66 'docker push oliverpm/hola-ripley:latest' "
+                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' ssh -t $DOCKER_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY} 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin' "
+                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' ssh -t $DOCKER_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY} 'docker push oliverpm/hola-ripley:latest' "
             }
         }
         stage('Deploy to Minukube') {
             steps {
                 echo 'Deploy App to Minukube'
-                sh "sshpass -p '$MINIKUBE_CREDENTIALS_PSW' scp deploymentServiceRipley.yml $MINIKUBE_CREDENTIALS_USR@192.168.18.66:/home/administrador/ripley"
-                sh "sshpass -p '$MINIKUBE_CREDENTIALS_PSW' ssh -t $MINIKUBE_CREDENTIALS_USR@192.168.18.66 'cd ripley; kubectl apply -f deploymentServiceRipley.yml' "
+                sh "sshpass -p '$MINIKUBE_CREDENTIALS_PSW' scp deploymentServiceRipley.yml $MINIKUBE_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}:/home/administrador/ripley"
+                sh "sshpass -p '$MINIKUBE_CREDENTIALS_PSW' ssh -t $MINIKUBE_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY} 'cd ripley; kubectl apply -f deploymentServiceRipley.yml' "
             }
         }
         stage('Test App Hola Ripley') {
             steps {
-		  sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' scp testAppDemoRipley.sh $JENKINS_CREDENTIALS_USR@192.168.18.66:/home/administrador/ripley"
-		  sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' ssh -t $JENKINS_CREDENTIALS_USR@192.168.18.66  ' cd ripley ; chmod 777 testAppDemoRipley.sh ' "
+		  sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' scp testAppDemoRipley.sh $JENKINS_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}:/home/administrador/ripley"
+		  sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' ssh -t $JENKINS_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}  ' cd ripley ; chmod 777 testAppDemoRipley.sh ' "
 		  script{
                     for (int i = 1; i <= 6; i++){
 			            echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Test Demo Ripley  ${i} >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-                        sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' ssh -t $JENKINS_CREDENTIALS_USR@192.168.18.66  ' cd ripley ; sh  testAppDemoRipley.sh ' "
+                        sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' ssh -t $JENKINS_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}  ' cd ripley ; sh  testAppDemoRipley.sh ' "
                         sleep(2)
                     }
              }		    
@@ -68,12 +68,12 @@ pipeline {
     
     }
 
-    /*
+    
     post {
-		always {
-            echo 'docker logout'
-			//sh 'docker logout'
+	always {
+            	echo 'docker logout'
+		sh 'docker logout'
 		}
 	}
-    */
+    
 }
