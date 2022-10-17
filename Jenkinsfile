@@ -19,6 +19,7 @@ pipeline {
         }
         stage('Checkout App Hola Ripley') {
             steps {
+
                 echo 'Checkout App Hola Ripley: Branch $BRANCH_NAME'
                 checkout([$class: 'GitSCM', branches: [[name: '*/$BRANCH_NAME']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-oliverpm', url: 'https://github.com/oliverpm/app-ripleydemo.git']]])
             }
