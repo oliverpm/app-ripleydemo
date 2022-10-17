@@ -53,12 +53,12 @@ pipeline {
         }
         stage('Test App Hola Ripley') {
             steps {
-		  sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' scp testAppDemoRipley.sh $JENKINS_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}:/home/administrador/ripley"
-		  sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' ssh -t $JENKINS_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}  ' cd ripley ; chmod 777 testAppDemoRipley.sh ' "
+		  sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' scp testAppDemoRipley.sh $JENKINS_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}:/home/administrador/ripley/$BRANCH_NAME"
+		  sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' ssh -t $JENKINS_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}  ' cd ripley/$BRANCH_NAME ; chmod 777 testAppDemoRipley.sh ' "
 		  script{
                     for (int i = 1; i <= 6; i++){
 			            echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Test Demo Ripley  ${i} >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-                        sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' ssh -t $JENKINS_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}  ' cd ripley ; sh  testAppDemoRipley.sh ' "
+                        sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' ssh -t $JENKINS_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}  ' cd ripley/$BRANCH_NAME ; sh  testAppDemoRipley.sh ' "
                         sleep(2)
                     }
              }		    
