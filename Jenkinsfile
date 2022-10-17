@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-	//def CODE_VERSION    
+	def IP_JENKINSHOST		="192.168.18.66"    
         DOCKER_CREDENTIALS		=credentials('docker-oliverpm')        
         JENKINS_CREDENTIALS		=credentials('jenkins-oliverpm')
         DOCKERHUB_CREDENTIALS		=credentials('dockerhub-oliverpm')
@@ -31,9 +31,9 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' scp Dockerfile $DOCKER_CREDENTIALS_USR@192.168.18.66:/home/administrador/ripley"
-                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' scp target/HolaRipley-0.0.1-SNAPSHOT.jar $DOCKER_CREDENTIALS_USR@192.168.18.66:/home/administrador/ripley/target"
-                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' ssh -t $DOCKER_CREDENTIALS_USR@192.168.18.66 'cd ripley; docker build . -t oliverpm/hola-ripley'"
+                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' scp Dockerfile $DOCKER_CREDENTIALS_USR@${IP_JENKINSHOST}:/home/administrador/ripley"
+                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' scp target/HolaRipley-0.0.1-SNAPSHOT.jar $DOCKER_CREDENTIALS_USR@${IP_JENKINSHOST}:/home/administrador/ripley/target"
+                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' ssh -t $DOCKER_CREDENTIALS_USR@${IP_JENKINSHOST} 'cd ripley; docker build . -t oliverpm/hola-ripley'"
             }
         }
         stage('Push Image To Docker Hub') {
@@ -52,12 +52,12 @@ pipeline {
         }
         stage('Test App Hola Ripley') {
             steps {
-		  sh "sshpass -p '$HOSTJENKINS_CREDENTIALS_PSW' scp testAppDemoRipley.sh $HOSTJENKINS_CREDENTIALS_USR@192.168.18.66:/home/administrador/ripley"
-		  sh "sshpass -p '$HOSTJENKINS_CREDENTIALS_PSW' ssh -t $HOSTJENKINS_CREDENTIALS_USR@192.168.18.66  ' cd ripley ; chmod 777 testAppDemoRipley.sh ' "
+		  sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' scp testAppDemoRipley.sh $JENKINS_CREDENTIALS_USR@192.168.18.66:/home/administrador/ripley"
+		  sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' ssh -t $JENKINS_CREDENTIALS_USR@192.168.18.66  ' cd ripley ; chmod 777 testAppDemoRipley.sh ' "
 		  script{
                     for (int i = 1; i <= 6; i++){
 			            echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Test Demo Ripley  ${i} >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-                        sh "sshpass -p '$HOSTJENKINS_CREDENTIALS_PSW' ssh -t $HOSTJENKINS_CREDENTIALS_USR@192.168.18.66  ' cd ripley ; sh  testAppDemoRipley.sh ' "
+                        sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' ssh -t $JENKINS_CREDENTIALS_USR@192.168.18.66  ' cd ripley ; sh  testAppDemoRipley.sh ' "
                         sleep(2)
                     }
              }		    
