@@ -72,7 +72,7 @@ pipeline {
     post {
 	always {
             	echo 'docker logout'
-		sh 'docker logout'
+		sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' ssh -t $JENKINS_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}  ' docker logout ' "
 		}
 	}
     
