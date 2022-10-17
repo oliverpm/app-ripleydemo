@@ -19,8 +19,8 @@ pipeline {
         }
         stage('Checkout App Hola Ripley') {
             steps {
-                echo 'Checkout App Hola Ripley'
-                checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-oliverpm', url: 'https://github.com/oliverpm/app-ripleydemo.git']]])
+                echo 'Checkout App Hola Ripley: Branch $BRANCH_NAME'
+                checkout([$class: 'GitSCM', branches: [[name: '*/$BRANCH_NAME']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-oliverpm', url: 'https://github.com/oliverpm/app-ripleydemo.git']]])
             }
         }
         stage('Build App Maven') {
@@ -31,9 +31,10 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' scp Dockerfile $DOCKER_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}:/home/administrador/ripley"
-                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' scp target/HolaRipley-0.0.1-SNAPSHOT.jar $DOCKER_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}:/home/administrador/ripley/target"
-                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' ssh -t $DOCKER_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY} 'cd ripley; docker build . -t oliverpm/hola-ripley'"
+		sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' ssh -t $DOCKER_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY} 'mkdir -p ripley/$BRANCH_NAME; mkdir -p ripley/$BRANCH_NAME/target' ";    
+                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' scp Dockerfile $DOCKER_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}:/home/administrador/ripley/$BRANCH_NAME/"
+                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' scp target/HolaRipley-0.0.1-SNAPSHOT.jar $DOCKER_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}:/home/administrador/ripley/$BRANCH_NAME/target"
+                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' ssh -t $DOCKER_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY} 'cd ripley/$BRANCH_NAME; docker build . -t oliverpm/hola-ripley'"
             }
         }
         stage('Push Image To Docker Hub') {
@@ -52,12 +53,12 @@ pipeline {
         }
         stage('Test App Hola Ripley') {
             steps {
-		  sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' scp testAppDemoRipley.sh $JENKINS_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}:/home/administrador/ripley"
-		  sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' ssh -t $JENKINS_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}  ' cd ripley ; chmod 777 testAppDemoRipley.sh ' "
+		  sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' scp testAppDemoRipley.sh $JENKINS_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}:/home/administrador/ripley/$BRANCH_NAME"
+		  sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' ssh -t $JENKINS_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}  ' cd ripley/$BRANCH_NAME ; chmod 777 testAppDemoRipley.sh ' "
 		  script{
                     for (int i = 1; i <= 6; i++){
 			            echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Test Demo Ripley  ${i} >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-                        sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' ssh -t $JENKINS_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}  ' cd ripley ; sh  testAppDemoRipley.sh ' "
+                        sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' ssh -t $JENKINS_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}  ' cd ripley/$BRANCH_NAME ; sh  testAppDemoRipley.sh ' "
                         sleep(2)
                     }
              }		    
