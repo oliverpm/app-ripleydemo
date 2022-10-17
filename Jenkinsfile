@@ -2,11 +2,11 @@ pipeline {
     agent any
 
     environment {
-        //HOSTJENKINS_IP=credentials('dockerhub-oliverpm')
-        //HOSTMINIKUBE_IP=credentials('dockerhub-oliverpm')
-        HOSTJENKINS_CREDENTIALS=credentials('jenkins-oliverpm')
-        //HOSTMINIKUBE_CREDENTIALS=credentials('dockerhub-oliverpm')
-        DOCKERHUB_CREDENTIALS=credentials('dockerhub-oliverpm')
+	//def CODE_VERSION    
+        DOCKER_CREDENTIALS		=credentials('docker-oliverpm')        
+        JENKINS_CREDENTIALS		=credentials('jenkins-oliverpm')
+        DOCKERHUB_CREDENTIALS		=credentials('dockerhub-oliverpm')
+	MINIKUBE_CREDENTIALS		=credentials('minikube-oliverpm')    
     }
 
     stages {
@@ -31,23 +31,23 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                sh "sshpass -p '$HOSTJENKINS_CREDENTIALS_PSW' scp Dockerfile $HOSTJENKINS_CREDENTIALS_USR@192.168.18.66:/home/administrador/ripley"
-                sh "sshpass -p '$HOSTJENKINS_CREDENTIALS_PSW' scp target/HolaRipley-0.0.1-SNAPSHOT.jar $HOSTJENKINS_CREDENTIALS_USR@192.168.18.66:/home/administrador/ripley/target"
-                sh "sshpass -p '$HOSTJENKINS_CREDENTIALS_PSW' ssh -t $HOSTJENKINS_CREDENTIALS_USR@192.168.18.66 'cd ripley; docker build . -t oliverpm/hola-ripley'"
+                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' scp Dockerfile $DOCKER_CREDENTIALS_USR@192.168.18.66:/home/administrador/ripley"
+                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' scp target/HolaRipley-0.0.1-SNAPSHOT.jar $DOCKER_CREDENTIALS_USR@192.168.18.66:/home/administrador/ripley/target"
+                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' ssh -t $DOCKER_CREDENTIALS_USR@192.168.18.66 'cd ripley; docker build . -t oliverpm/hola-ripley'"
             }
         }
         stage('Push Image To Docker Hub') {
             steps {
                 echo 'Push Image To Docker Hub'
-                sh "sshpass -p '$HOSTJENKINS_CREDENTIALS_PSW' ssh -t $HOSTJENKINS_CREDENTIALS_USR@192.168.18.66 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin' "
-                sh "sshpass -p '$HOSTJENKINS_CREDENTIALS_PSW' ssh -t $HOSTJENKINS_CREDENTIALS_USR@192.168.18.66 'docker push oliverpm/hola-ripley:latest' "
+                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' ssh -t $DOCKER_CREDENTIALS_USR@192.168.18.66 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin' "
+                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' ssh -t $DOCKER_CREDENTIALS_USR@192.168.18.66 'docker push oliverpm/hola-ripley:latest' "
             }
         }
         stage('Deploy to Minukube') {
             steps {
                 echo 'Deploy App to Minukube'
-                sh "sshpass -p '$HOSTJENKINS_CREDENTIALS_PSW' scp deploymentServiceRipley.yml $HOSTJENKINS_CREDENTIALS_USR@192.168.18.66:/home/administrador/ripley"
-                sh "sshpass -p '$HOSTJENKINS_CREDENTIALS_PSW' ssh -t $HOSTJENKINS_CREDENTIALS_USR@192.168.18.66 'cd ripley; kubectl apply -f deploymentServiceRipley.yml' "
+                sh "sshpass -p '$MINIKUBE_CREDENTIALS_PSW' scp deploymentServiceRipley.yml $MINIKUBE_CREDENTIALS_USR@192.168.18.66:/home/administrador/ripley"
+                sh "sshpass -p '$MINIKUBE_CREDENTIALS_PSW' ssh -t $MINIKUBE_CREDENTIALS_USR@192.168.18.66 'cd ripley; kubectl apply -f deploymentServiceRipley.yml' "
             }
         }
         stage('Test App Hola Ripley') {
