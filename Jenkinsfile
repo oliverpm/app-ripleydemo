@@ -19,7 +19,7 @@ pipeline {
         }
         stage('Checkout App Hola Ripley') {
             steps {
-                echo 'Checkout App Hola Ripley'
+                echo 'Checkout App Hola Ripley: Branch $BRANCH_NAME'
                 checkout([$class: 'GitSCM', branches: [[name: '*/$BRANCH_NAME']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-oliverpm', url: 'https://github.com/oliverpm/app-ripleydemo.git']]])
             }
         }
@@ -31,9 +31,9 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' scp Dockerfile $DOCKER_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}:/home/administrador/ripley"
-                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' scp target/HolaRipley-0.0.1-SNAPSHOT.jar $DOCKER_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}:/home/administrador/ripley/target"
-                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' ssh -t $DOCKER_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY} 'cd ripley; docker build . -t oliverpm/hola-ripley'"
+                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' scp Dockerfile $DOCKER_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}:/home/administrador/ripley/$BRANCH_NAME"
+                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' scp target/HolaRipley-0.0.1-SNAPSHOT.jar $DOCKER_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}:/home/administrador/ripley/$BRANCH_NAME/target"
+                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' ssh -t $DOCKER_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY} 'cd ripley/$BRANCH_NAME; docker build . -t oliverpm/hola-ripley'"
             }
         }
         stage('Push Image To Docker Hub') {
