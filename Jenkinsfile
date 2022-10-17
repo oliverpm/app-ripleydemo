@@ -47,7 +47,7 @@ pipeline {
         stage('Deploy to Minukube') {
             steps {
                 echo 'Deploy App to Minukube'
-                sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' ssh -t $JENKINS_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}  ' cd ripley; delete -f deploymentServiceRipley.yml ' "
+                sh "sshpass -p '$JENKINS_CREDENTIALS_PSW' ssh -t $JENKINS_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}  ' cd ripley; kubectl delete -f deploymentServiceRipley.yml ' "
                 sh "sshpass -p '$MINIKUBE_CREDENTIALS_PSW' scp deploymentServiceRipley.yml $MINIKUBE_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}:/home/administrador/ripley"
                 sh "sshpass -p '$MINIKUBE_CREDENTIALS_PSW' ssh -t $MINIKUBE_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY} 'cd ripley; kubectl apply -f deploymentServiceRipley.yml' "
             }
