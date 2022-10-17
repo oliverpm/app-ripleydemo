@@ -19,7 +19,7 @@ public class homeController {
 		}
 		return "\n Hola Banco Ripley!!! \n" +
 				"<br> \n" +
-				"<br> Branch:  FEATURE BB \n" +
+				"<br> Branch:  FEATURE AA \n" +
 				"<br> ==> POD: Host Name: " + name + "\n" +
 				"<br> ==> POD: Ip Address: " + address + "\n";
 	}
