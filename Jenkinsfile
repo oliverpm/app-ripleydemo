@@ -20,7 +20,7 @@ pipeline {
         stage('Checkout App Hola Ripley') {
             steps {
                 echo 'Checkout App Hola Ripley'
-                //checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-oliverpm', url: 'https://github.com/oliverpm/app-ripleydemo.git']]])
+                checkout([$class: 'GitSCM', branches: [[name: '*/$BRANCH_NAME']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-oliverpm', url: 'https://github.com/oliverpm/app-ripleydemo.git']]])
             }
         }
         stage('Build App Maven') {
