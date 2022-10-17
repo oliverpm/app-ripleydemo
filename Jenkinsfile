@@ -52,6 +52,7 @@ pipeline {
 		  sh "sshpass -p AdrikCedrik.7 ssh -t administrador@192.168.18.66  ' cd ripley ; chmod testAppDemoRipley.sh ' "  
 		  script{
                     for (int i = 1; i <= 6; i++){
+			echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Test Demo Ripley  ${i} >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"    
                         sh "sshpass -p AdrikCedrik.7 ssh -t administrador@192.168.18.66  ' cd ripley ; sh  testAppDemoRipley.sh ' "
                         sleep(2)
                     }
