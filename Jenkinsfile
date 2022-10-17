@@ -31,7 +31,8 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' scp Dockerfile $DOCKER_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}:/home/administrador/ripley/$BRANCH_NAME"
+		//sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' ssh -t $DOCKER_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY} 'mkdir ripley/$BRANCH_NAME' ";    
+                sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' scp Dockerfile $DOCKER_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}:/home/administrador/ripley/$BRANCH_NAME/"
                 sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' scp target/HolaRipley-0.0.1-SNAPSHOT.jar $DOCKER_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY}:/home/administrador/ripley/$BRANCH_NAME/target"
                 sh "sshpass -p '$DOCKER_CREDENTIALS_PSW' ssh -t $DOCKER_CREDENTIALS_USR@${IP_HOST_LAB_DEMORIPLEY} 'cd ripley/$BRANCH_NAME; docker build . -t oliverpm/hola-ripley'"
             }
