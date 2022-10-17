@@ -49,7 +49,7 @@ pipeline {
         stage('Test App Hola Ripley') {
             steps {
 		  sh "sshpass -p AdrikCedrik.7 scp testAppDemoRipley.sh administrador@192.168.18.66:/home/administrador/ripley"
-		  sh "sshpass -p AdrikCedrik.7 ssh -t administrador@192.168.18.66  ' cd ripley ; chmod testAppDemoRipley.sh ' "  
+		  sh "sshpass -p AdrikCedrik.7 ssh -t administrador@192.168.18.66  ' cd ripley ; chmod 777 testAppDemoRipley.sh ' "
 		  script{
                     for (int i = 1; i <= 6; i++){
 			            echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Test Demo Ripley  ${i} >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
